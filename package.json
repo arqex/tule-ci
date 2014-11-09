@@ -1,0 +1,8 @@
+{
+  "name": "tule-ci",
+  "description": "Continuos integration for tule. Allows to create scripts to be triggered by hooks in the original repo.",
+  "version": "0.0.1",
+  "main": "ci.js",
+  "author": "Javi Marquez <javi@arqex.com>",
+  "dependencies": {}
+}

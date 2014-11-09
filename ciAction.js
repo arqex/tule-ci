@@ -1,0 +1,100 @@
+var config = require('config'),
+	logger = require('winston'),
+	childProcess = require('child_process'),
+	Q = require('q')
+;
+
+var types = {
+	spawn: function( step ) {
+		var deferred = Q.defer(),
+			child = childProcess.spawn( step.cmd, step.args, {stdio: 'inherit'} )
+		;
+
+		child.on( 'error', function( err ){
+			deferred.reject( err );
+		});
+
+		child.on( 'close', function( ){
+			deferred.resolve();
+		});
+
+		return deferred.promise;
+	},
+	exec: function() {
+		var deferred = Q.defer(),
+			child = childProcess.exec( step.cmd )
+		;
+
+		child.on( 'error', function( err ){
+			deferred.reject( err );
+		});
+
+		child.stdout.on( 'data', function (msg){
+			console.log( msg );
+		});
+
+		child.on( 'close', function( ){
+			deferred.resolve();
+		});
+
+		return deferred.promise;
+	}
+};
+
+var process = function process( action ) {
+	var result = Q.resolve(1),
+		illegal = action.steps.filter( function( s ){
+			return s.type != 'spawn' && s.type != 'exec';
+		}),
+		i = 0
+	;
+
+	if( illegal.length )
+		return q.reject( new Error( 'Illegal type of step in action' ) );
+
+	action.steps.forEach( function(s){
+		i++;
+		result = result.then( function(){
+			logger.info( s.preMsg || 'Starting step ' + i );
+			return types[ s.type ]( s )
+				.then( function(){
+					logger.info( s.postMsg || 'Finished step ' + i );
+				})
+			;
+		});
+	});
+
+	return result;
+};
+
+module.exports = {
+	ciEvent: function( req, res ){
+		var actionName = req.query.action,
+			key = req.query.key
+		;
+
+		if( !actionName || !key ||
+			!config.ci.actions[actionName] || config.ci.actions[actionName].actionKey != key
+		) {
+			logger.error(' Illegal atempt of using ci hooks, action: ' + actionName + ', key: ' + key );
+			return res.send(404);
+		}
+
+		process( config.ci.actions[actionName] )
+			.then( function(){
+				console.log( 'CI action ' + actionName + ' finished ok.' );
+				return res.send('ok');
+			})
+			.catch( function( err ){
+				logger.error( err.stack );
+				return res.send(404);
+			})
+		;
+	},
+
+	errorGet: function( req, res ){
+		logger.error( 'Trying to access a CI action through a get request' );
+		return res.send(404);
+	}
+
+};
