@@ -4,6 +4,8 @@ var config = require('config'),
 	Q = require('q')
 ;
 
+var prcs = process;
+
 var types = {
 	spawn: function( step ) {
 		var deferred = Q.defer(),
@@ -44,6 +46,7 @@ var types = {
 	},
 
 	forceRestart: function( ) {
+
 		return Q.reject( new Error('restart') );
 	}
 };
@@ -94,13 +97,12 @@ module.exports = {
 			})
 			.catch( function( err ){
 
-				// If it is a forced restart, just throw the exception
-				// and let the server restart on fail, since ctl_app command
-				// it is not working
 				if( err.message == 'restart' ){
 					console.log( 'Restarting' );
+					res.send('ok');
+
 					// Force failure exit to restart
-					process.exit(1);
+					prcs.exit(1);
 				}
 
 				logger.error( err.stack );
