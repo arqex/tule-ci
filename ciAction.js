@@ -7,7 +7,8 @@ var config = require('config'),
 var types = {
 	spawn: function( step ) {
 		var deferred = Q.defer(),
-			child = childProcess.spawn( step.cmd, step.args, {stdio: 'inherit'} )
+			child = childProcess.spawn( step.cmd, step.args, {stdio: 'inherit', cwd: cwd} ),
+			cwd = step.cwd || '~'
 		;
 
 		child.on( 'error', function( err ){
@@ -23,10 +24,11 @@ var types = {
 
 	exec: function( step ) {
 		var deferred = Q.defer(),
-			child
+			child,
+			cwd = step.cwd || '~'
 		;
 
-		child = childProcess.exec( step.cmd, function( err, stdout, stdin ){
+		child = childProcess.exec( step.cmd, {cwd: cwd}, function( err, stdout, stdin ){
 			if( err )
 				return deferred.reject( err );
 
