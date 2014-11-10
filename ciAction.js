@@ -4,8 +4,6 @@ var config = require('config'),
 	Q = require('q')
 ;
 
-var prcs = process;
-
 var types = {
 	spawn: function( step ) {
 		var deferred = Q.defer(),
@@ -46,12 +44,11 @@ var types = {
 	},
 
 	forceRestart: function( ) {
-		process.exit(0);
 		return Q.reject( new Error('restart') );
 	}
 };
 
-var process = function process( action ) {
+var run = function run( action ) {
 	var result = Q.resolve(1),
 		illegal = action.steps.filter( function( s ){
 			return s.type != 'spawn' && s.type != 'exec' && s.type != 'forceRestart';
@@ -90,7 +87,7 @@ module.exports = {
 			return res.send(404);
 		}
 
-		process( config.ci.actions[actionName] )
+		run( config.ci.actions[actionName] )
 			.then( function(){
 				console.log( 'CI action ' + actionName + ' finished ok.' );
 				return res.send('ok');
@@ -102,7 +99,7 @@ module.exports = {
 					res.send('ok');
 
 					// Force failure exit to restart
-					prcs.exit(1);
+					process.exit(1);
 				}
 
 				logger.error( err.stack );
