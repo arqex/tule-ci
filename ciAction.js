@@ -46,7 +46,7 @@ var types = {
 	},
 
 	forceRestart: function( ) {
-		prcs.exit(1);
+		process.exit(0);
 		return Q.reject( new Error('restart') );
 	}
 };
