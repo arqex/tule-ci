@@ -12,6 +12,7 @@ var types = {
 		;
 
 		child.on( 'error', function( err ){
+			console.log( step );
 			deferred.reject( err );
 		});
 
@@ -29,8 +30,10 @@ var types = {
 		;
 
 		child = childProcess.exec( step.cmd, {cwd: cwd}, function( err, stdout, stdin ){
-			if( err )
+			if( err ){
+				console.log( step );
 				return deferred.reject( err );
+			}
 
 
 			console.log( stdout );
