@@ -97,8 +97,12 @@ module.exports = {
 				// If it is a forced restart, just throw the exception
 				// and let the server restart on fail, since ctl_app command
 				// it is not working
-				if( err.message == 'restart' )
-					throw err;
+				if( err.message == 'restart' ){
+					console.log( 'Restarting' );
+					process.nextTick( function(){
+						throw err;
+					});
+				}
 
 				logger.error( err.stack );
 				return res.send(404);
