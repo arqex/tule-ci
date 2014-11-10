@@ -20,7 +20,7 @@ var types = {
 
 		return deferred.promise;
 	},
-	exec: function() {
+	exec: function( step ) {
 		var deferred = Q.defer(),
 			child = childProcess.exec( step.cmd )
 		;
