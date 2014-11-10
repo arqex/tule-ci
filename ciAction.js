@@ -95,8 +95,8 @@ module.exports = {
 			.catch( function( err ){
 
 				if( err.message == 'restart' ){
-					console.log( 'Restarting' );
 					res.send('ok');
+					console.log( 'Restarting' );
 
 					// Force failure exit to restart
 					process.exit(1);
