@@ -20,17 +20,20 @@ var types = {
 
 		return deferred.promise;
 	},
+
 	exec: function( step ) {
 		var deferred = Q.defer(),
-			child = childProcess.exec( step.cmd )
+			child
 		;
 
-		child.on( 'error', function( err ){
-			deferred.reject( err );
-		});
+		child = childProcess.exec( step.cmd, function( err, stdout, stdin ){
+			if( err )
+				deferred.reject( err );
 
-		child.stdout.on( 'data', function (msg){
-			console.log( msg );
+			stdout.on( 'data', function (msg){
+				console.log( msg );
+			});
+
 		});
 
 		child.on( 'close', function( ){
