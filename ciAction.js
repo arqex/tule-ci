@@ -98,11 +98,9 @@ module.exports = {
 				// and let the server restart on fail, since ctl_app command
 				// it is not working
 				if( err.message == 'restart' ){
-					process.nextTick( function(){
-						console.log( 'Restarting' );
-						// Force failure exit to restart
-						process.exit(1);
-					});
+					console.log( 'Restarting' );
+					// Force failure exit to restart
+					process.exit(1);
 				}
 
 				logger.error( err.stack );
