@@ -96,10 +96,13 @@ module.exports = {
 
 				if( err.message == 'restart' ){
 					res.send('ok');
-					console.log( 'Restarting' );
 
-					// Force failure exit to restart
-					process.exit(1);
+					return process.nextTick( function(){
+						console.log( 'Restarting' );
+
+						// Force failure exit to restart
+						process.exit(1);
+					});
 				}
 
 				logger.error( err.stack );
