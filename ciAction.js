@@ -28,15 +28,10 @@ var types = {
 
 		child = childProcess.exec( step.cmd, function( err, stdout, stdin ){
 			if( err )
-				deferred.reject( err );
+				return deferred.reject( err );
 
-			stdout.on( 'data', function (msg){
-				console.log( msg );
-			});
 
-		});
-
-		child.on( 'close', function( ){
+			console.log( stdout );
 			deferred.resolve();
 		});
 
