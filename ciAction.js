@@ -41,13 +41,17 @@ var types = {
 		});
 
 		return deferred.promise;
+	},
+
+	forceRestart: function( ) {
+		return Q.reject( new Error('restart') );
 	}
 };
 
 var process = function process( action ) {
 	var result = Q.resolve(1),
 		illegal = action.steps.filter( function( s ){
-			return s.type != 'spawn' && s.type != 'exec';
+			return s.type != 'spawn' && s.type != 'exec' && s.type != 'forceRestart';
 		}),
 		i = 0
 	;
@@ -89,6 +93,13 @@ module.exports = {
 				return res.send('ok');
 			})
 			.catch( function( err ){
+
+				// If it is a forced restart, just throw the exception
+				// and let the server restart on fail, since ctl_app command
+				// it is not working
+				if( err.message == 'restart' )
+					throw err;
+
 				logger.error( err.stack );
 				return res.send(404);
 			})
